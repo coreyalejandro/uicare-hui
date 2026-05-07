@@ -1,0 +1,104 @@
+name: uicare-hui CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Job 1: Architectural Boundary Check (INVARIANT_011)
+  # Blocks merge if safety-core imports any forbidden package.
+  # -------------------------------------------------------------------------
+  boundary-check:
+    name: "INVARIANT_011 — Boundary Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: "Lint safety-core boundaries"
+        run: npm run lint:boundaries
+        # This step MUST fail on any forbidden import in packages/safety-core
+
+  # -------------------------------------------------------------------------
+  # Job 2: Phase 1.5 Spec Gate
+  # All SPEC items must be APPROVED in STATUS.json before core tests run.
+  # -------------------------------------------------------------------------
+  spec-gate:
+    name: "Phase 1.5 — Safety Spec Gate"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Check STATUS.json approval"
+        run: |
+          node -e "
+            const s = require('./STATUS.json');
+            const blocked = s.items.filter(i => i.status !== 'APPROVED');
+            if (blocked.length > 0) {
+              console.error('SPEC GATE FAILED. Unapproved items:');
+              blocked.forEach(i => console.error(' -', i.id, i.title, ':', i.status));
+              process.exit(1);
+            }
+            console.log('All spec items approved. Gate passes.');
+          "
+
+  # -------------------------------------------------------------------------
+  # Job 3: Safety Core Unit Tests (100% branch coverage on invariants)
+  # -------------------------------------------------------------------------
+  core-tests:
+    name: "safety-core Unit Tests"
+    runs-on: ubuntu-latest
+    needs: [boundary-check, spec-gate]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: "Build safety-core"
+        run: npm run build --workspace=packages/safety-core
+      - name: "Run core unit tests with coverage"
+        run: npm run test --workspace=packages/safety-core -- --coverage
+      - name: "Upload coverage"
+        uses: actions/upload-artifact@v4
+        with:
+          name: safety-core-coverage
+          path: packages/safety-core/coverage/
+
+  # -------------------------------------------------------------------------
+  # Job 4: PWA Type Check
+  # -------------------------------------------------------------------------
+  pwa-typecheck:
+    name: "PWA TypeScript Check"
+    runs-on: ubuntu-latest
+    needs: [core-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run typecheck --workspace=apps/pwa
+
+  # -------------------------------------------------------------------------
+  # Job 5: Governance Invariant Suite
+  # -------------------------------------------------------------------------
+  governance-tests:
+    name: "Governance Invariant Suite"
+    runs-on: ubuntu-latest
+    needs: [core-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run test:governance

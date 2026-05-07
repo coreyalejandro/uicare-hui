@@ -1,0 +1,56 @@
+{
+  "_comment": "Phase 1.5 Safety Specification Gate. All items must be APPROVED before any behavioral-state implementation proceeds.",
+  "schemaVersion": "1.0.0",
+  "lastUpdated": "2025-05-07",
+  "gateStatus": "PENDING",
+  "items": [
+    {
+      "id": "SPEC_001",
+      "title": "Not-Claimed Boundary Statement",
+      "path": "docs/not-claimed-boundary.md",
+      "status": "APPROVED",
+      "reviewer": "coreyalejandro",
+      "approvedAt": "2025-05-07"
+    },
+    {
+      "id": "SPEC_002",
+      "title": "Behavioral State Machine Specification",
+      "path": "docs/behavioral-state-spec.md",
+      "status": "APPROVED",
+      "reviewer": "coreyalejandro",
+      "approvedAt": "2025-05-07"
+    },
+    {
+      "id": "SPEC_003",
+      "title": "Consent Flow Specification",
+      "path": "docs/consent-flow-spec.md",
+      "status": "APPROVED",
+      "reviewer": "coreyalejandro",
+      "approvedAt": "2025-05-07"
+    },
+    {
+      "id": "SPEC_004",
+      "title": "Intervention Copy Review",
+      "path": "docs/intervention-copy.md",
+      "status": "APPROVED",
+      "reviewer": "coreyalejandro",
+      "approvedAt": "2025-05-07"
+    },
+    {
+      "id": "SPEC_005",
+      "title": "Hexagonal Boundary Map",
+      "path": "docs/hexagonal-boundaries.md",
+      "status": "APPROVED",
+      "reviewer": "coreyalejandro",
+      "approvedAt": "2025-05-07"
+    },
+    {
+      "id": "SPEC_006",
+      "title": "Governance + Invariants Report",
+      "path": "docs/governance-report.md",
+      "status": "DRAFT",
+      "reviewer": null,
+      "approvedAt": null
+    }
+  ]
+}

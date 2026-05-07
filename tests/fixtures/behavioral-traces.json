@@ -1,0 +1,56 @@
+[
+  {
+    "id": "trace-001",
+    "description": "Normal session — BASELINE throughout",
+    "signals": [
+      { "heartRateDelta": 0.05, "sleepDeficitDelta": 0.05, "activityDelta": 0.05, "textVolumeRecent": 200, "collectedAtMs": 1000 },
+      { "heartRateDelta": 0.08, "sleepDeficitDelta": 0.04, "activityDelta": 0.06, "textVolumeRecent": 300, "collectedAtMs": 61000 },
+      { "heartRateDelta": 0.06, "sleepDeficitDelta": 0.06, "activityDelta": 0.05, "textVolumeRecent": 150, "collectedAtMs": 121000 }
+    ],
+    "expectedFinalState": "BASELINE",
+    "expectedMaxRisk": 0.10
+  },
+  {
+    "id": "trace-002",
+    "description": "Gradual escalation to ELEVATED",
+    "signals": [
+      { "heartRateDelta": 0.05, "sleepDeficitDelta": 0.05, "activityDelta": 0.05, "textVolumeRecent": 100, "collectedAtMs": 1000 },
+      { "heartRateDelta": 0.05, "sleepDeficitDelta": 0.05, "activityDelta": 0.05, "textVolumeRecent": 100, "collectedAtMs": 61000 },
+      { "heartRateDelta": 0.05, "sleepDeficitDelta": 0.05, "activityDelta": 0.05, "textVolumeRecent": 100, "collectedAtMs": 121000 },
+      { "heartRateDelta": 0.40, "sleepDeficitDelta": 0.35, "activityDelta": 0.30, "textVolumeRecent": 2000, "collectedAtMs": 181000 }
+    ],
+    "expectedFinalState": "ELEVATED",
+    "expectedMaxRisk": 0.40
+  },
+  {
+    "id": "trace-003",
+    "description": "Acute escalation — HARD_BLOCK expected",
+    "signals": [
+      { "heartRateDelta": 0.05, "sleepDeficitDelta": 0.05, "activityDelta": 0.05, "textVolumeRecent": 100, "collectedAtMs": 1000 },
+      { "heartRateDelta": 0.05, "sleepDeficitDelta": 0.05, "activityDelta": 0.05, "textVolumeRecent": 100, "collectedAtMs": 61000 },
+      { "heartRateDelta": 0.05, "sleepDeficitDelta": 0.05, "activityDelta": 0.05, "textVolumeRecent": 100, "collectedAtMs": 121000 },
+      { "heartRateDelta": 0.90, "sleepDeficitDelta": 0.90, "activityDelta": 0.90, "textVolumeRecent": 40000, "collectedAtMs": 181000 }
+    ],
+    "expectedFinalState": "CRISIS_ADJACENT",
+    "expectedMaxRisk": 1.0
+  },
+  {
+    "id": "trace-004",
+    "description": "Cold start — gates suppressed for first 5 minutes",
+    "coldStart": true,
+    "signals": [
+      { "heartRateDelta": 0.90, "sleepDeficitDelta": 0.90, "activityDelta": 0.90, "textVolumeRecent": 40000, "collectedAtMs": 1000 }
+    ],
+    "expectedGateDecision": "ALLOW",
+    "expectedColdStartActive": true
+  },
+  {
+    "id": "trace-005",
+    "description": "Consent revoked — all gates return ALLOW",
+    "consentStatus": "REVOKED",
+    "signals": [
+      { "heartRateDelta": 0.90, "sleepDeficitDelta": 0.90, "activityDelta": 0.90, "textVolumeRecent": 40000, "collectedAtMs": 181000 }
+    ],
+    "expectedGateDecision": "ALLOW"
+  }
+]
