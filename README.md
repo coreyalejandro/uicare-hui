@@ -28,7 +28,7 @@ claiming clinical authority, and without removing user agency — only slowing i
 
 ---
 
-## What it actually does (no overclaiming)
+## Mechanism
 
 **Signal collection**
 The `SignalCollector` port accepts typed behavioral signals: heart rate delta, sleep
@@ -144,8 +144,7 @@ graph TD
 
 **Dependency direction is inward only.** `safety-core` never imports from `apps/*`
 or any package that brings in React or browser APIs. This is enforced by ESLint
-boundary rules at `.eslintrc.boundaries.js` — not by convention, by CI. A violation
-blocks merge.
+boundary rules at `.eslintrc.boundaries.js`. A violation blocks merge.
 
 ---
 
@@ -389,4 +388,4 @@ that consent at any time (one tap, immediate effect), and retains the ability to
 override all gates except HARD_BLOCK — which exists precisely because some states
 are too elevated for override to be meaningful.
 
-The system is honest about what it cannot do. That honesty is load-bearing.
+The system is honest about what it cannot do.
