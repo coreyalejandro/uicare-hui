@@ -30,8 +30,8 @@ import {
   assertColdStartGatesSuppressed,
 } from "@uicare-hui/safety-core";
 
-import { loadBaselineSnapshot, saveBaselineSnapshot } from "../adapters/storage/baselineStorage.js";
-import { IndexedDBConsentStore } from "../adapters/consent/IndexedDBConsentStore.js";
+import { loadBaselineSnapshot, saveBaselineSnapshot } from "../adapters/storage/baselineStorage";
+import { IndexedDBConsentStore } from "../adapters/consent/IndexedDBConsentStore";
 
 interface SafetyState {
   behavioralState: BehavioralState;

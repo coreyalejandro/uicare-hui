@@ -13,7 +13,7 @@
 
 import React, { useCallback, useRef, useEffect } from "react";
 import type { GateResult } from "@uicare-hui/safety-core";
-import { InterventionBanner } from "./InterventionBanner.js";
+import { InterventionBanner } from "../interventions/InterventionBanner";
 
 interface BehavioralGateProps {
   gateResult: GateResult;
@@ -73,7 +73,7 @@ export function BehavioralGate({
         overrideAvailable={gateResult.overrideAvailable}
         onOverride={onOverride}
         onGrounding={onGrounding}
-        onDismiss={isBlocking ? undefined : onDismiss}
+        {...(!isBlocking && { onDismiss })}
       />
     </div>
   );
