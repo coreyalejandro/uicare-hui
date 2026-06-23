@@ -95,32 +95,32 @@ UICare HUI is the first system that **reads the room** for the right signs.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    packages/safety-core                      │
-│              Pure TypeScript, Zero Runtime Deps              │
-│                                                               │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │Behavioral│  │  Safety  │  │ Consent  │  │  Ports   │   │
-│  │  Domain  │  │  Domain  │  │  Domain  │  │Interface │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│                                                               │
-│  • state-machine    • action-gate     • consent-enforcer     │
-│  • risk-scorer      • intervention    • consent-validator    │
-│  • baseline-manager • crisis-detector                        │
+│                    packages/safety-core                     │
+│              Pure TypeScript, Zero Runtime Deps             │
+│                                                             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
+│  │Behavioral│  │  Safety  │  │ Consent  │  │  Ports   │     │
+│  │  Domain  │  │  Domain  │  │  Domain  │  │Interface │     │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘     │
+│                                                             │
+│  • state-machine    • action-gate     • consent-enforcer    │
+│  • risk-scorer      • intervention    • consent-validator   │
+│  • baseline-manager • crisis-detector                       │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                 packages/vision-processor                    │
-│              Vision-Based Absence Detection                  │
-│                                                               │
-│  • VisionCollector port    • AbsenceDetector                 │
-│  • GazeTracker             • MovementAnalyzer                │
-│  • Vision-Agents bridge    • Object interaction tracking     │
+│                 packages/vision-processor                   │
+│              Vision-Based Absence Detection                 │
+│                                                             │
+│  • VisionCollector port    • AbsenceDetector                │
+│  • GazeTracker             • MovementAnalyzer               │
+│  • Vision-Agents bridge    • Object interaction tracking    │
 └─────────────────────────────────────────────────────────────┘
                               ↓
-┌─────────────────────────────────────────────────────────────┐
-│                        apps/pwa                              │
-│                   Next.js 14 PWA                             │
-│                                                               │
+┌───────────────────────────────────────────────────────────┐
+│                        apps/pwa                           │
+│                   Next.js 14 PWA                          │
+│                                                           │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
 │  │  Components  │  │    Agents    │  │   Adapters   │     │
 │  │              │  │              │  │              │     │
@@ -130,7 +130,7 @@ UICare HUI is the first system that **reads the room** for the right signs.
 │  │   Gate       │  │   Agent      │  │   Storage    │     │
 │  │ • Settings   │  │              │  │              │     │
 │  └──────────────┘  └──────────────┘  └──────────────┘     │
-└─────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────┘
 ```
 
 ---
