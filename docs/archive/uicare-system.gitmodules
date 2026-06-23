@@ -1,0 +1,3 @@
+[submodule "moodring-beta"]
+	path = moodring-beta
+	url = https://github.com/coreyalejandro/uicare-components.git

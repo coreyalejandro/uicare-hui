@@ -1,0 +1,42 @@
+@keyframes ninja-blink {
+  0%, 100% { transform: scaleY(1); opacity: 0.8; }
+  50% { transform: scaleY(0.8); opacity: 0.4; }
+}
+
+/* Base styles for inputs and textareas */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea {
+  color: #000000;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    color: #ffffff;
+    background-color: #1a1a1a;
+    border-color: #4a5568;
+  }
+}
+
+/* Explicit light mode class */
+.light-mode textarea,
+.light-mode input {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+/* Explicit dark mode class */
+.dark-mode textarea,
+.dark-mode input {
+  color: #ffffff !important;
+  background-color: #1a1a1a !important;
+} 

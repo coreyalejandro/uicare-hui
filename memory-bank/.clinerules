@@ -1,0 +1,71 @@
+# UICare System Project Rules
+
+These rules capture important patterns and conventions specific to the UICare System project.
+
+## Code Conventions
+
+1. **Component Structure**:
+   - Use 'use client' directive at the top of client components
+   - Use functional components with hooks
+   - Export named components (except for page.tsx files)
+   - Include proper TypeScript typing for all props
+
+2. **State Management**:
+   - Use React Context for global state
+   - Use useState for component-local state
+   - Prefer composition over prop drilling
+
+3. **Styling Approach**:
+   - Use Tailwind utility classes as primary styling method
+   - Create semantic class names for complex components
+   - Use CSS variables for theming (--background, --foreground)
+   - Follow mobile-first responsive design
+
+4. **File Organization**:
+   - Components go in src/app/components
+   - Pages use the Next.js App Router convention
+   - Keep related components together
+   - Use index.ts files for clean exports
+
+## Naming Conventions
+
+1. **Components**: PascalCase (e.g., RealityFilter, SettingsPanel)
+2. **Hooks**: camelCase with "use" prefix (e.g., useSettings, useReality)
+3. **Context**: PascalCase with "Context" suffix (e.g., SettingsContext)
+4. **Files**: Component files match component name (RealityFilter.tsx)
+5. **Functions**: camelCase, descriptive verb phrases (e.g., handleClick, updateSettings)
+6. **CSS Classes**: All lowercase with hyphens when custom classes are needed
+
+## Reality Filter Implementation
+
+When implementing new reality filters:
+1. Add the filter type to the RealityFilter type union in RealityProvider.tsx
+2. Add the filter option to the array in RealityFilter.tsx
+3. Add the corresponding style logic in the getFilterStyle function in RealityProvider.tsx
+4. Update the filterIntensity object in SettingsContext.tsx default settings
+5. Add a slider for the new filter in SettingsPanel.tsx
+
+## Settings Implementation
+
+When adding new settings:
+1. Add the setting to the Settings interface in SettingsContext.tsx
+2. Add a default value in the defaultSettings object
+3. Add the corresponding UI control in SettingsPanel.tsx or UIcareToolbar.tsx
+4. Update localStorage persistence if needed
+
+## Documentation Patterns
+
+When documenting new features:
+1. Add a section to the documentation page under the appropriate tab
+2. Include a "What it does" section explaining the feature
+3. Include a "Benefits for users" section explaining the value
+4. Include code examples where appropriate
+5. Update the activeContext.md and progress.md files in the memory bank
+
+## Testing Approach
+
+1. Test across different browsers (Chrome, Firefox, Safari)
+2. Verify mobile responsiveness
+3. Check accessibility with keyboard navigation
+4. Verify reality filters work as expected
+5. Test settings persistence by refreshing the page

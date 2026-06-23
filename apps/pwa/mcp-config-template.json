@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "MCP_DOCKER": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "alpine/socat", "STDIO", "TCP:host.docker.internal:8811"]
+    },
+    "MCP_CDP": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "--security-opt", "seccomp=unconfined", "-p", "9222:9222", "browserless/chrome:latest", "--remote-debugging-address=0.0.0.0", "--remote-debugging-port=9222"]
+    },
+    "MCP_DB": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-e", "POSTGRES_PASSWORD=cursor", "-e", "POSTGRES_USER=cursor", "-p", "5432:5432", "postgres:latest"]
+    }
+  }
+} 

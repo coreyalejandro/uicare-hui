@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hackathon-proj-agents
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hackathon-proj-agents
+  template:
+    metadata:
+      labels:
+        app: hackathon-proj-agents
+    spec:
+      containers:
+      - name: monitor-agent
+        image: ${REGISTRY}/monitor-agent:latest
+        imagePullPolicy: Always
+        env:
+        - name: MODEL_NAME
+          value: gpt-4o-mini
+        - name: AGENT_ID
+          value: MonitorAgent
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      - name: rescue-agent
+        image: ${REGISTRY}/rescue-agent:latest
+        imagePullPolicy: Always
+        env:
+        - name: MODEL_NAME
+          value: gpt-4o-mini
+        - name: AGENT_ID
+          value: RescueAgent
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m" 

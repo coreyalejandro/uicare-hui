@@ -1,0 +1,16 @@
+project: hackathon-proj
+agents:
+  - id: MonitorAgent
+    model: gpt-4o-mini
+    instructions: |
+      Detect if user text repeats or loops.
+      Return {"loopDetected": boolean, "details": string}.
+    tools:
+      - type: chatCompletion
+  - id: RescueAgent
+    model: gpt-4o-mini
+    instructions: |
+      If loopDetected is true, offer three clear steps to resolve.
+      Return {"advice": [string, string, string]}.
+    tools:
+      - type: chatCompletion

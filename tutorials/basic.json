@@ -1,0 +1,16 @@
+{
+  "title": "Basic Task Tutorial",
+  "steps": [
+    {
+      "text": "Step one instruction.",
+      "image": "/images/step1.png",
+      "audio": "/audio/step1.mp3",
+      "warnings": ["Be careful"]
+    },
+    {
+      "text": "Step two instruction.",
+      "image": "/images/step2.png",
+      "warnings": ["Double-check settings"]
+    }
+  ]
+}

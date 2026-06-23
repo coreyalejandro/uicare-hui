@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="240" stroke="white" stroke-width="16" fill="none"/>
+  <!-- Inner circle -->
+  <circle cx="256" cy="256" r="200" fill="#000000"/>
+  <!-- Text -->
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" fill="white" font-family="Inter, -apple-system, system-ui" font-size="120" font-weight="700">RING</text>
+  <!-- Subtle pulse animation -->
+  <circle cx="256" cy="256" r="220" stroke="white" stroke-width="2" fill="none">
+    <animate attributeName="r" values="220;225;220" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg> 

@@ -1,0 +1,10 @@
+subscription: ce8b971e-b539-4e4a-97db-f9936b1521c9
+resource_group: uicare-rg
+location: eastus
+ml_workspace: uicare-ml
+ml_project: uicare-monitor
+openai_account: uicare-openai
+openai_model: gpt-4o-mini
+openai_deploy_name: monitor-agent
+openai_sku: S0
+openai_model_version: latest
