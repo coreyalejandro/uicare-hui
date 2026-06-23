@@ -1,0 +1,31 @@
+{
+  "name": "@uicare-hui/vision-processor",
+  "version": "0.1.0",
+  "description": "Vision-based behavioral absence detection for UICare HUI",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --config ../../.eslintrc.boundaries.js"
+  },
+  "keywords": [
+    "vision",
+    "behavioral-safety",
+    "absence-detection",
+    "webcam",
+    "uicare"
+  ],
+  "author": "coreyalejandro",
+  "license": "MIT",
+  "dependencies": {
+    "@uicare-hui/safety-core": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.6",
+    "eslint": "^8.57.0"
+  }
+}

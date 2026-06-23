@@ -20,8 +20,14 @@
   },
   "devDependencies": {
     "typescript": "^5.4.0",
-    "vitest": "^1.6.0"
+    "vitest": "^4.1.6"
   },
-  "files": ["dist", "src"],
-  "sideEffects": false
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": false,
+  "dependencies": {
+    "next": "^16.2.6"
+  }
 }

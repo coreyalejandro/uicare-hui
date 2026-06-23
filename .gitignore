@@ -10,3 +10,8 @@ reports/
 .env
 .env.local
 .env.production
+
+# OpenMemory - IDE/Assistant specific rules
+.windsurf/rules/openmemory.md
+CLAUDE.md
+AGENTS.md

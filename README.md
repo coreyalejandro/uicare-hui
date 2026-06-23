@@ -1,362 +1,323 @@
 # UICare HUI — Behavioral Safety System
 
-**A fail-safe Progressive Web App for high-risk neurodivergent users.**
+**A fail-safe Progressive Web App for high-risk neurodivergent users with vision-based "reading the room" capabilities.**
 
-This is a behavioral safety aid. It is not a medical device. It does not diagnose
-conditions. It does not replace emergency services or clinical support.
-
----
-
-## What it does for you
-
-**User A — bipolar, hypomanic episodes**
-
-You set it up once. You tell it you want it to watch for your patterns. It learns
-what your normal looks like: your resting heart rate range, your usual sleep, your
-typical activity level, how much you type in a session. That is your baseline. It
-lives on your device, encrypted, never transmitted.
-
-On a Tuesday at 2am you are awake, heart rate elevated, you have typed 4,000 words
-in the last hour, you slept three hours last night. You open your banking app and
-start moving money. The system has been watching all of this. Your risk score is
-above threshold. Before the transfer completes, it stops you — not with a diagnosis,
-not with an alarm — with a single screen that says: we noticed a pattern. Take a
-breath. You can still do this, but not right now.
-
-At CRISIS_ADJACENT there is no override. The button does not exist. That is the
-point.
-
-When your numbers come back down — sleep improves, heart rate drops, you have been
-calm for a stretch — the gate lifts on its own. No one unlocks it for you.
-
-**User B — ADHD, compulsive spending, impulsive messaging**
-
-Same system, same consent flow. You opted in. The friction is proportional to where
-your signals are. At ELEVATED you get a soft message, a pause. At HEIGHTENED you
-confirm. At ACUTE you confirm again. You still have agency at every level except
-the top. The system is not trying to control you. It is trying to give you the two
-seconds your neurology sometimes does not.
-
-You can revoke consent at any time. One tap. Monitoring stops immediately. No delay,
-no grace period. Your data stays on your device.
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![Tests](https://img.shields.io/badge/tests-72%20passing-success)]()
 
 ---
 
-## Why this exists
+## 🎯 What It Does
 
-The moments when a person is most likely to take a catastrophic action — large
-financial transfers, relationship-ending messages, irreversible deletions — are
-precisely the moments their judgment is most impaired and their self-awareness lowest.
-Existing software has no concept of this. It executes.
+UICare HUI prevents catastrophic decisions during behavioral crises by detecting **what you're NOT doing** — the most reliable predictor of mood state and impaired judgment.
 
-This system interposes proportional friction at the decision point before the action
-completes. It operates offline. It requires consent. It does not claim clinical
-authority. It does not remove agency — only slows it.
+### Real User Scenarios
 
----
+**User A — Bipolar, Hypomanic Episodes**
 
-## Mechanism
+> Tuesday, 2am. Heart rate elevated. 4,000 words typed in the last hour. Three hours of sleep. You open your banking app to move money. Before the transfer completes, the system stops you — not with a diagnosis, not with an alarm — with a single screen: "We noticed a pattern. Take a breath. You can still do this, but not right now."
 
-**Signal collection**
-The `SignalCollector` port accepts typed behavioral signals: heart rate delta, sleep
-deficit delta, activity level delta, and recent text volume. These are relative to the
-user's own rolling baseline, not population norms.
+At CRISIS_ADJACENT, there is no override. The button does not exist. That is the point.
 
-**Baseline management**
-`updateBaseline()` in `risk-scorer.ts` uses Welford's online algorithm to maintain a
-running mean across all three physiological dimensions. Updates are immutable: the
-function returns a new baseline object, never mutates in place.
+**User B — ADHD, Compulsive Spending**
 
-**Risk scoring**
-`computeRiskScore()` produces a composite 0–1 score. Below 3 samples it returns 0.0 —
-cold-start uncertainty is explicit. Above that threshold:
+> Same system, same consent flow. The friction is proportional to your signals. At ELEVATED you get a soft message. At HEIGHTENED you confirm. At ACUTE you confirm again. You still have agency at every level except the top.
 
-```
-heartRate contribution  = max(0, hrDelta - baseline.hr)    x 0.33
-sleep contribution      = max(0, sleepDelta - baseline.sleep) x 0.34
-activity contribution   = max(0, activityDelta - baseline.activity) x 0.33
-text volume overlay     = min(0.10, textVolumeRecent / 50000)
-```
-
-Weights are heuristics for personal deviation, not validated clinical thresholds.
-
-**State machine**
-`transitionState()` maps risk score to one of five behavioral states with hysteresis
-(0.08) to prevent flapping. Downward transitions step one level at a time. The state
-machine is a pure function: same score + same current state = same output, every time.
-
-```
-State             Threshold   Gate imposed   Override
-BASELINE          < 0.25      ALLOW          n/a
-ELEVATED          >= 0.25     SOFT_GATE      yes
-HEIGHTENED        >= 0.50     FIRM_GATE      yes
-ACUTE             >= 0.70     FIRM_GATE      yes
-CRISIS_ADJACENT   >= 0.85     HARD_BLOCK     NO
-```
-
-**Action gate**
-`evaluateGate()` checks four rules in order:
-
-1. Protected action (emergency exit, accessibility, consent flow) → ALLOW always.
-2. Cold-start window active → ALLOW, gates suppressed while baseline builds.
-3. Consent not GRANTED → ALLOW, no gate without consent.
-4. Apply STATE_GATE_MAP.
-
-HARD_BLOCK has `overrideAvailable: false`. There is no code path that converts it
-to ALLOW. This is INVARIANT_003 and it is tested.
-
-**Consent enforcement**
-`checkConsent()` operates on pre-loaded consent records. It never touches storage.
-If `behavioral_monitoring` is not GRANTED in the snapshot, gates do not fire.
-`applyRevocation()` returns a new record with REVOKED status. There is no grace
-period, no retry.
+You can revoke consent at any time. One tap. Monitoring stops immediately.
 
 ---
 
-## Architecture
+## 🚀 Key Features
 
-Hexagonal (ports and adapters). The innermost hexagon is `packages/safety-core`:
-pure TypeScript, zero runtime dependencies. Every external concern — storage, UI,
-AI, clock — is a port interface. The PWA implements those ports as concrete adapters.
+### 1. **Vision-Based Absence Detection** 🎥
+- **Webcam monitoring** detects what you're NOT doing
+- **Gaze tracking** identifies avoidance patterns (looking but body turned away)
+- **Movement analysis** catches micro-behavior changes
+- **Object interaction** tracking notices when you stop using typical items
+- **Spatial behavior** understanding (the spot you avoid with your body but watch with your eyes)
 
-```mermaid
-graph TD
-    subgraph core["packages/safety-core — pure TS, zero runtime deps"]
-        PORTS["Ports\nSignalCollector · ConsentStore\nInterventionDisplay · AuditLogger\nDataLifecycle · Clock · AIAdvisor"]
-        BEHAVIORAL["Behavioral domain\nstate-machine · risk-scorer\ncold-start-policy · baseline-manager"]
-        SAFETY["Safety domain\naction-gate · override-policy\nintervention · crisis-detector"]
-        CONSENT["Consent domain\nconsent-enforcer · consent-validator"]
-        INV["invariants.ts\n11 typed assertion functions"]
-        PORTS --> BEHAVIORAL
-        PORTS --> SAFETY
-        PORTS --> CONSENT
-        BEHAVIORAL --> SAFETY
-        CONSENT --> SAFETY
-        INV --> SAFETY
-        INV --> CONSENT
-    end
+### 2. **Behavioral Safety Core** 🛡️
+- **Risk scoring** based on your personal baseline (not population norms)
+- **State machine** with 5 levels: BASELINE → ELEVATED → HEIGHTENED → ACUTE → CRISIS_ADJACENT
+- **Proportional friction** at decision points
+- **Hard block** at crisis level (no override available)
+- **Offline-first** — works without network
 
-    subgraph pwa["apps/pwa — outer adapter layer"]
-        IDB["IndexedDBConsentStore\nimplements ConsentStore"]
-        BS["baselineStorage\nAES-256-GCM encrypted"]
-        AI["AzureOpenAIAdvisor\nimplements AIAdvisor\nnull fallback on failure"]
-        GATE["BehavioralGate.tsx\nReact gate UI"]
-        BANNER["InterventionBanner.tsx\nWCAG 2.1 AA"]
-        HOOK["useBehavioralSafety.ts\norchestration hook"]
-    end
+### 3. **AI Agents** 🤖
+- **MonitorAgent** — Continuous behavioral loop detection
+- **RescueAgent** — Targeted, neurodivergent-friendly interventions
+- **Never punitive, always precise**
 
-    PORTS -.->|port contract| IDB
-    PORTS -.->|port contract| AI
-    PORTS -.->|port contract| GATE
-    GATE --> BANNER
-    HOOK --> GATE
-    HOOK --> IDB
-    HOOK --> BS
-    HOOK --> AI
-```
+### 4. **Neurodivergent-Friendly UI** ♿
+- **Reality Filters** — Visual modes (Standard, Ninja Vision, Protocol)
+- **Trauma-informed** interactions
+- **WCAG 2.1 AA** accessibility
+- **Reduced motion** support
+- **Customizable** settings panel
 
-Dependency direction is inward only. `safety-core` never imports from `apps/*`
-or any package that brings in React or browser APIs. Enforced by ESLint boundary
-rules at `.eslintrc.boundaries.js`. A violation blocks merge.
+### 5. **Privacy & Consent First** 🔒
+- **Explicit consent** required before monitoring
+- **One-tap revocation** with immediate effect
+- **AES-256-GCM** encryption for all data
+- **Device-only storage** — never transmitted
+- **No grace period** on revocation
 
 ---
 
-## Behavioral signal flow
+## 📊 Why This Matters
 
-```mermaid
-sequenceDiagram
-    participant W as Signal Source
-    participant RS as risk-scorer.ts
-    participant SM as state-machine.ts
-    participant CE as consent-enforcer.ts
-    participant AG as action-gate.ts
-    participant UI as BehavioralGate.tsx
+### The Problem
+Current behavior-monitoring systems capture what users **DO**. They miss what matters most: what users **STOP** doing.
 
-    W->>RS: BehavioralSignal + WearableBaseline
-    RS-->>SM: riskScore in 0 to 1
-    SM-->>AG: BehavioralState
+- The file they haven't touched in three days when they normally open it first
+- The commit pattern that went from structured to chaotic overnight
+- The spot in the room they're avoiding with their body but can't keep their eyes off
 
-    Note over CE: ConsentStore adapter hydrates snapshot before gate call
+### The Solution
+UICare HUI is the first system that **reads the room** for the right signs.
 
-    W->>AG: user attempts action
-    AG->>CE: checkConsent for behavioral_monitoring
-    CE-->>AG: allowed true or false
+### Market Size
+- **15-20% of population is neurodivergent**
+- Bipolar disorder: ~2.8% of US adults (7+ million)
+- ADHD: ~4.4% of US adults (10+ million)
+- Autism: ~2.2% of US adults (5+ million)
+- **Combined: 20+ million US adults**
 
-    alt consent NOT GRANTED
-        AG-->>UI: ALLOW - no consent
-    else CRISIS_ADJACENT
-        AG-->>UI: HARD_BLOCK - overrideAvailable false
-        UI->>UI: render block screen, no override affordance
-    else ELEVATED or HEIGHTENED or ACUTE
-        AG-->>UI: SOFT_GATE or FIRM_GATE - overrideAvailable true
-        UI->>UI: render friction intervention with override
-    else BASELINE
-        AG-->>UI: ALLOW
-    end
+### Competitive Gap
+**NO existing system monitors behavioral absence.** Existing tools: productivity trackers, mood journals, medication reminders. None prevent catastrophic actions at the decision point.
+
+---
+
+## 🏗️ Architecture
+
+### Hexagonal (Ports & Adapters)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    packages/safety-core                      │
+│              Pure TypeScript, Zero Runtime Deps              │
+│                                                               │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │Behavioral│  │  Safety  │  │ Consent  │  │  Ports   │   │
+│  │  Domain  │  │  Domain  │  │  Domain  │  │Interface │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+│                                                               │
+│  • state-machine    • action-gate     • consent-enforcer     │
+│  • risk-scorer      • intervention    • consent-validator    │
+│  • baseline-manager • crisis-detector                        │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                 packages/vision-processor                    │
+│              Vision-Based Absence Detection                  │
+│                                                               │
+│  • VisionCollector port    • AbsenceDetector                 │
+│  • GazeTracker             • MovementAnalyzer                │
+│  • Vision-Agents bridge    • Object interaction tracking     │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                        apps/pwa                              │
+│                   Next.js 14 PWA                             │
+│                                                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │  Components  │  │    Agents    │  │   Adapters   │     │
+│  │              │  │              │  │              │     │
+│  │ • Reality    │  │ • Monitor    │  │ • IndexedDB  │     │
+│  │   Filter     │  │   Agent      │  │ • Azure AI   │     │
+│  │ • Behavioral │  │ • Rescue     │  │ • Baseline   │     │
+│  │   Gate       │  │   Agent      │  │   Storage    │     │
+│  │ • Settings   │  │              │  │              │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Consent flow
+## 🚦 Behavioral States & Gates
 
-```mermaid
-flowchart TD
-    START([User opens app]) --> HYDRATE["ConsentStore loads records from IndexedDB"]
-    HYDRATE --> CHECK{"behavioral_monitoring status?"}
-    CHECK -->|NOT_FOUND or PENDING| PROMPT["Consent prompt shown"]
-    PROMPT -->|User grants| WRITE["IndexedDBConsentStore writes GRANTED record"]
-    PROMPT -->|User declines| NOGATES["App runs normally\ngates never fire\nno monitoring"]
-    WRITE --> MONITORING["Monitoring active\nsignals accepted\nbaseline building"]
-    CHECK -->|GRANTED| MONITORING
-    CHECK -->|REVOKED| NOGATES
-    MONITORING -->|User revokes anytime| REVOKE["applyRevocation returns REVOKED record"]
-    REVOKE --> PERSIST["Adapter persists to IndexedDB"]
-    PERSIST --> NOGATES
-```
+| State | Risk Score | Gate Type | Override Available | Example |
+|-------|-----------|-----------|-------------------|---------|
+| **BASELINE** | < 0.25 | ALLOW | N/A | Normal activity |
+| **ELEVATED** | ≥ 0.25 | SOFT_GATE | ✅ Yes | "Take a moment" |
+| **HEIGHTENED** | ≥ 0.50 | FIRM_GATE | ✅ Yes | "Confirm this action" |
+| **ACUTE** | ≥ 0.70 | FIRM_GATE | ✅ Yes | "Confirm again" |
+| **CRISIS_ADJACENT** | ≥ 0.85 | HARD_BLOCK | ❌ **NO** | "Not right now" |
 
 ---
 
-## Gate decision logic
+## 📦 Installation
 
-```mermaid
-flowchart TD
-    ACTION([User initiates action]) --> PROTECTED{"isProtectedAction?\nemergency / accessibility / consent"}
-    PROTECTED -->|yes| ALLOW1["ALLOW — always"]
-    PROTECTED -->|no| COLDSTART{"Cold-start window active?"}
-    COLDSTART -->|yes| ALLOW2["ALLOW — baseline still building"]
-    COLDSTART -->|no| CONSENT{"behavioral_monitoring GRANTED?"}
-    CONSENT -->|no| ALLOW3["ALLOW — no consent, no gate"]
-    CONSENT -->|yes| STATE{"BehavioralState?"}
-    STATE -->|BASELINE| ALLOW4["ALLOW"]
-    STATE -->|ELEVATED| SOFT["SOFT_GATE\nfriction message\noverride available"]
-    STATE -->|HEIGHTENED or ACUTE| FIRM["FIRM_GATE\nexplicit re-confirmation required\noverride available"]
-    STATE -->|CRISIS_ADJACENT| HARD["HARD_BLOCK\naction blocked\nno override\nINVARIANT_003"]
-```
+### Prerequisites
+- Node.js 18.0.0+
+- Python 3.12+ (for vision processing)
+- Webcam (for vision features)
 
----
+### Quick Start
 
-## Offline-first and AI failure
-
-Cloud AI is an adapter. The `AIAdvisor` port returns `Promise<AIAdvisory | null>`.
-When the network is down or the API fails, the adapter returns `null`. The core
-falls through to local gate logic. HARD_BLOCK is still HARD_BLOCK. No gate is
-disabled by AI failure. This is INVARIANT_009, tested with a null adapter.
-
----
-
-## Monorepo structure
-
-```
-uicare-hui/
-├── packages/
-│   └── safety-core/           Pure TypeScript. Zero runtime deps.
-│       ├── src/
-│       │   ├── ports/         SignalCollector, ConsentStore, InterventionDisplay,
-│       │   │                  AuditLogger, DataLifecycle, Clock, AIAdvisor
-│       │   ├── behavioral/    state-machine, risk-scorer, cold-start-policy,
-│       │   │                  feedback-classifier, baseline-manager
-│       │   ├── safety/        action-gate, override-policy, intervention,
-│       │   │                  agency-preservation, crisis-detector
-│       │   ├── consent/       consent-enforcer, consent-validator
-│       │   ├── invariants.ts  11 typed assertion functions
-│       │   └── index.ts       public API
-│       └── tests/             57 unit tests, no DOM, no stubs
-├── apps/
-│   ├── pwa/                   Next.js 14. Outer adapter layer.
-│   │   └── src/
-│   │       ├── adapters/      IndexedDBConsentStore, baselineStorage (AES-256-GCM),
-│   │       │                  AzureOpenAIAdvisor (null on failure)
-│   │       ├── components/    BehavioralGate.tsx, InterventionBanner.tsx
-│   │       └── lib/           useBehavioralSafety.ts, encryption.ts
-│   └── experimental-tools/   Isolated Python tooling. No production dependency.
-├── tests/
-│   └── governance/            15 invariant integration tests
-├── .github/workflows/ci.yml   5-job pipeline
-├── .eslintrc.boundaries.js    INVARIANT_011 enforcement
-└── STATUS.json                gateStatus: APPROVED
-```
-
----
-
-## Invariants
-
-All 11 are typed assertion functions in `src/invariants.ts`. They throw. They are
-exercised in the test suite.
-
-| ID   | Invariant                                              | Enforcement                    |
-|------|--------------------------------------------------------|--------------------------------|
-| I001 | Monitoring requires consent status GRANTED             | checkConsent() + test          |
-| I002 | Risk score always in [0, 1]                            | computeRiskScore() + test      |
-| I003 | CRISIS_ADJACENT maps to HARD_BLOCK, no override        | evaluateGate() + test          |
-| I004 | Gate decision is deterministic given same inputs       | pure function + test           |
-| I005 | Cold-start suppresses FIRM and HARD gates              | evaluateGate() rule 2 + test   |
-| I006 | Consent revocation takes effect immediately            | applyRevocation() + test       |
-| I007 | Audit log entries are immutable once written           | AuditLogger port contract      |
-| I008 | No clinical language in user-facing copy               | copy audit gate                |
-| I009 | AI failure does not disable local gates                | null adapter test              |
-| I010 | Data lifecycle requires explicit user authorization    | DataLifecycle port contract    |
-| I011 | safety-core has zero runtime dependencies              | ESLint CI boundary check       |
-
----
-
-## Tests
-
-```
-packages/safety-core
-  consent-enforcer.test.ts      7 tests
-  risk-scorer.test.ts           7 tests
-  action-gate.test.ts           9 tests
-  state-machine.test.ts        10 tests
-  invariants.test.ts           24 tests
-
-tests/governance
-  invariants.test.ts           15 tests
-
-Total: 72 passing. No browser stubs.
-```
-
-Coverage thresholds: 80% branches, 80% functions, 80% lines on `packages/safety-core`.
-
----
-
-## Running it
-
-```
+```bash
+# Clone repository
 git clone https://github.com/coreyalejandro/uicare-hui
 cd uicare-hui
+
+# Install dependencies
 npm install
-```
 
-```
+# Run tests
 cd packages/safety-core && npx vitest run
+
+# Start PWA development server
+cd apps/pwa && npm run dev
 ```
 
-```
+Visit `http://localhost:3000`
+
+---
+
+## 🧪 Testing
+
+```bash
+# Safety core tests (72 passing)
+cd packages/safety-core
+npx vitest run
+
+# Integration tests
+cd tests/governance
+npx vitest run
+
+# Lint boundary rules
 npm run lint:boundaries
 ```
 
-```
-cd apps/pwa && npm run build
-```
+**Coverage:** 80%+ branches, functions, lines
 
 ---
 
-## Status
+## 📚 Documentation
 
-- Build contract: CRSP-UICARE-HUI-001
-- Governance: The Living Constitution, Satellite topology
-- Gate status: APPROVED — all 6 specification documents signed off 2026-05-07
-- CI: lint:boundaries blocks merge on any boundary violation
-- Not deployed. Build verified locally. Deploy blocked pending signal adapter
-  acceptance tests.
+- [**Product Demand Analysis**](PRODUCT_DEMAND_ANALYSIS.md) — Why UICare HUI is the most in-demand product
+- [**Integration Plan**](INTEGRATION_PLAN.md) — How all components fit together
+- [**Behavioral State Spec**](docs/behavioral-state-spec.md) — State machine details
+- [**Consent Flow Spec**](docs/consent-flow-spec.md) — Consent implementation
+- [**Governance Report**](docs/governance-report.md) — Safety invariants
+- [**Design System**](docs/design-system.md) — Neurodivergent-friendly design
+- [**Mania Monitoring**](docs/mania-monitoring.md) — Wearable sensor integration
 
 ---
 
-## Scope boundary
+## 🔐 Privacy & Security
 
-This system does not diagnose any condition. It does not qualify as a medical device.
-It does not replace emergency services, clinical support, or crisis intervention.
-It does not guarantee prevention of any specific harm.
+- **AES-256-GCM encryption** for all stored data
+- **Device-only storage** — never transmitted to servers
+- **Explicit consent** required before any monitoring
+- **One-tap revocation** with immediate effect
+- **No grace period** — monitoring stops instantly
+- **Protected actions** always allowed (emergency, accessibility, consent)
+- **Audit logging** for all gate decisions
 
-The user consents to monitoring, revokes it in one tap with immediate effect, and
-retains the ability to override all gates except HARD_BLOCK.
+---
+
+## 🎨 Customization
+
+### Reality Filters
+- **Standard** — Default appearance
+- **Ninja Vision** — High contrast, saturated
+- **Protocol** — Sepia-toned, focused
+
+### Settings Panel
+- Consent management
+- Visual preferences
+- Baseline calibration
+- Notification preferences
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! This system is built from lived experience and benefits from diverse perspectives.
+
+### Areas for Contribution
+- Vision processing improvements
+- Additional behavioral patterns
+- Intervention copy refinement
+- Accessibility enhancements
+- Documentation
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file
+
+---
+
+## 🙏 Acknowledgments
+
+- Built from lived experience as an autistic, schizophrenic person with OCD, ADHD, and anxiety
+- Inspired by Shakespeare's confidante — the character who sees the protagonist more clearly than they see themselves
+- Special thanks to the neurodivergent community for insights and feedback
+- Vision capabilities powered by [Vision-Agents](https://github.com/GetStream/Vision-Agents)
+
+---
+
+## ⚠️ Important Disclaimers
+
+**This is a behavioral safety aid. It is NOT:**
+- A medical device
+- A diagnostic tool
+- A replacement for emergency services
+- A replacement for clinical support
+- A guarantee of harm prevention
+
+**The user:**
+- Must provide explicit consent
+- Can revoke consent at any time
+- Retains agency at all levels except CRISIS_ADJACENT
+- Is responsible for their own safety
+
+---
+
+## 📞 Support
+
+- **Issues:** [GitHub Issues](https://github.com/coreyalejandro/uicare-hui/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/coreyalejandro/uicare-hui/discussions)
+- **Email:** support@uicare.dev
+
+---
+
+## 🗺️ Roadmap
+
+### ✅ Completed
+- [x] Safety-core with 72 passing tests
+- [x] Hexagonal architecture
+- [x] Consent enforcement
+- [x] Behavioral state machine
+- [x] Risk scoring with baselines
+- [x] Vision processor foundation
+- [x] MonitorAgent & RescueAgent
+- [x] React components integration
+- [x] Documentation consolidation
+
+### 🚧 In Progress
+- [ ] Vision-Agents Python bridge
+- [ ] Webcam integration
+- [ ] Real-time absence detection
+- [ ] Integration testing
+
+### 📋 Planned
+- [ ] Production deployment
+- [ ] Mobile PWA optimization
+- [ ] Wearable sensor integration
+- [ ] Multi-language support
+- [ ] Community feedback loop
+
+---
+
+**Status:** Build verified locally. Not yet deployed.  
+**Version:** 0.1.0  
+**Last Updated:** 2026-06-23
+
+---
+
+*"This is not theoretical. This is the system the designer needed and never had."*

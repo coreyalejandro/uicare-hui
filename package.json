@@ -21,10 +21,13 @@
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.0",
     "typescript": "^5.4.0",
-    "vitest": "^1.6.0"
+    "vitest": "^4.1.6"
   },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
+  },
+  "dependencies": {
+    "next": "^16.2.6"
   }
 }

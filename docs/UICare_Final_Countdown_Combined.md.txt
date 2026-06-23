@@ -1,0 +1,146 @@
+# uicare-system: complete prd & implementation blueprint for microsoft ai agent hackathon 2025 (with roadmap for future development)
+
+---
+
+## Table of Contents
+
+1. Executive Summary  
+2. Market Opportunity Analysis  
+   - 2.1 Target User Segments & Pain Points  
+   - 2.2 Competitive Landscape & Gaps  
+   - 2.3 Strategic Positioning & Phased Rollout  
+3. MoodRING Beta: 70-Minute Deterministic Build Plan  
+   - A. Azure Foundation  
+   - B. Define Azure AI Agents  
+   - C. MoodRING Web App Development  
+   - D. Deployment & Testing  
+   - E. Peer Review & Validation  
+4. UICare VSCode Extension MVP: 20-Minute Deterministic Build Plan  
+   - A. Azure Foundation  
+   - B. Define Azure AI Agents  
+   - C. VSCode Extension Development  
+   - D. Deployment & Testing  
+   - E. Peer Review & Validation  
+5. Demo Automation Scripts  
+   - 5.1 MoodRING Playwright Script  
+   - 5.2 VSCode Extension Tester Script  
+
+---
+
+## 1. Executive Summary
+
+UICare merges emotional well-being and productivity into a unified AI assistant platform.  
+- **MoodRING**: Adaptive web UI overlay sensing mood via interaction patterns, offering self-care and productivity prompts.  
+- **UICare VSCode Extension**: In-editor AI assistant detecting developer frustration loops and delivering contextual code suggestions.  
+Leverages Microsoft Azure AI Agents, Fluent UI, and Next.js to fill a market void for proactive, cross-application, context-aware assistance.  
+
+---
+
+## 2. Market Opportunity Analysis
+
+### 2.1 Target User Segments & Pain Points
+
+- **Developers & Engineers**: Yak-shaving loops; need real-time loop detection & code rescue.  
+- **Writers & Creatives**: Perfectionism paralysis; need AI prompts to advance drafts.  
+- **Designers**: Micro-tinkering; need automated snapshots & design suggestions.  
+- **Neurodivergent Users**: Hyperfocus spirals; need mood-aware UI cues & in-flow self-care.  
+- **Enterprise Workers**: Context-switching fatigue across 13+ apps/day; need system-wide continuity & privacy.  
+
+### 2.2 Competitive Landscape & Gaps
+
+| Category              | Examples                              | UICare Gap Addressed                                      |
+|-----------------------|---------------------------------------|-----------------------------------------------------------|
+| Focus Timers          | Focus Booster, Pomodoro apps          | Content-aware, loop-specific intervention                  |
+| Distraction Trackers  | RescueTime, Freedom                   | Proactive context-aware assistance; enhanced privacy       |
+| In-App AI Copilots    | GitHub Copilot, MS365 Copilot         | Cross-app awareness; unsolicited, emotion-aware guidance   |
+| Well-Being Nudges     | Viva Insights, Digital Wellbeing      | Embedded self-care without leaving workflow                |
+
+### 2.3 Strategic Positioning & Phased Rollout
+
+1. **Phase 1 (Weeks 1–8): IDE-First Launch**  
+   - Release VSCode extension MVP; measure loop triggers & suggestion uptake.  
+2. **Phase 2 (Weeks 5–12): MoodRING Beta**  
+   - Deploy Next.js overlay; browser extension; integrate AI self-care prompts.  
+3. **Phase 3 (Months 3–9): System-Wide Assistant**  
+   - Native client for Windows/macOS; plugins for Office, Figma, browsers; enterprise trials.
+
+---
+
+## 3. MoodRING Beta: 70-Minute Deterministic Build Plan
+
+> **Prerequisite**: Azure subscription, Azure CLI v2.45+, Node.js 18+, npm 9+, VS Code installed.
+
+| Window | Time  | Task                                            | Command / File Path                                                                                                      | Expected Output                                     |
+|------:|------:|-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| **1** | 0–2   | Clone Repo & Verify                             | `git clone https://github.com/coreyalejandro/uicare-components.git moodring-beta`<br>`cd moodring-beta`                   | Local folder with `README.md`, `components/`        |
+| **2** | 2–4   | Initialize Next.js App                          | `npx create-next-app@14 . --typescript --app`                                                                            | `app/`, `package.json`, `tsconfig.json` generated   |
+| **3** | 4–6   | Install Dependencies                            | `npm install @fluentui/react @azure/ai-projects @azure/identity tailwindcss postcss autoprefixer`                          | `node_modules/` populated                            |
+| **4** | 6–8   | Configure Tailwind                              | Create `tailwind.config.js`; add Tailwind directives to `app/globals.css`                                                 | Tailwind CSS utilities available                    |
+| **5** | 8–12  | Fluent UI Provider                              | Edit `app/layout.tsx` to wrap `<FluentProvider theme={teamsLightTheme}>`                                                  | Fluent UI theme applied                             |
+| **6** | 12–16 | MoodContext Setup                               | `context/MoodContext.tsx`: create Context, `MoodProvider` with `currentMood`, `setMood`, `openPanel()`                   | Context/provider ready                              |
+| **7** | 16–20 | MoodButton Component                            | `components/MoodButton.tsx`: Fluent `IconButton` with `className="animate-pulse"`, `onClick={openPanel}`                   | Pulsing settings button                             |
+| **8** | 20–26 | MoodPanel Shell                                 | `components/MoodPanel.tsx`: basic `Panel` with `isOpen`, `onDismiss={onClose}`, headerText                               | Empty panel appears                                 |
+| **9** | 26–32 | Pivot Tabs & FontSelector                       | Extend `MoodPanel` with `Pivot` tabs; create `components/FontSelector.tsx` using `ComboBox`                              | Tabs & font dropdown render                         |
+| **10**| 32–40 | Apply Fonts & Mood                              | Wire `setMood` to apply CSS classes to `document.documentElement.className`                                              | Theme and font update                                |
+| **11**| 40–48 | AzureAIService                                  | `services/AzureAIService.ts`: implement `getMoodSuggestion(context)` via Azure AI Agents                                  | Service ready                                        |
+| **12**| 48–55 | Integrate Suggestions                           | In `MoodPanel`, `useEffect` calls `getMoodSuggestion(current)` and displays advice                                       | Advice text fetched                                  |
+| **13**| 55–60 | Styling & Accessibility                         | Audit with Lighthouse/axe; add `aria-label`, ensure color contrast                                                       | WCAG 2.1 AA compliant                                |
+| **14**| 60–66 | Home Page Hookup                                | Edit `app/page.tsx` to wrap UI in `<MoodProvider>` and render `<MoodButton/>`, `<MoodPanel/>`                             | Complete UI                                          |
+| **15**| 66–70 | Build, Export & Smoke Test                      | `npm run build && npm run export`; manual UI walkthrough                                                                  | Beta ready                                           |
+
+**Hand-Off Criteria**:  
+- Repository tagged `v1.0-moodring`.  
+- `README.md` contains build & run instructions.  
+- Live demo deployed to Azure Static Web Apps.
+
+---
+
+## 4. UICare VSCode Extension MVP: 20-Minute Deterministic Build Plan
+
+> **Prerequisite**: Node.js 18+, npm 9+, VS Code 1.80+.
+
+| Window | Time  | Task                                            | Command / File Path                                                                                                    | Expected Output                               |
+|------:|------:|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| **1** | 0–2   | Clone Repo & Verify                             | `git clone https://github.com/coreyalejandro/uicare-vscode.git uicare-vscode-mvp`<br>`cd uicare-vscode-mvp`              | Folder with `src/`, `package.json`            |
+| **2** | 2–4   | Install Dependencies                            | `npm install node-fetch @azure/ai-projects @azure/identity`                                                             | Dependencies installed                        |
+| **3** | 4–6   | Configure `package.json`                        | Add `uicare.azureConnectionString`, `editCountThreshold`, `suggestionCooldown` under `contributes.configuration`        | Settings schema present                       |
+| **4** | 6–8   | ConfigManager                                   | `src/ConfigManager.ts`: read `workspace.getConfiguration("uicare")`                                                     | Config module ready                           |
+| **5** | 8–10  | MonitorModule                                   | `src/monitor.ts`: track edits, fire `onLoop` when threshold (5 edits/2min) passed                                        | Loop detector ready                           |
+| **6** | 10–12 | ContextAggregator                               | `src/context.ts`: collect `visibleTextEditors` paths & content                                                          | Context collector ready                       |
+| **7** | 12–14 | AIOrchestrator                                  | `src/orchestrator.ts`: POST to MonitorAgent → RescueAgent → MVPPlannerAgent, return suggestions                         | Orchestrator ready                            |
+| **8** | 14–16 | SuggestionPanel                                 | `src/ui.ts`: Webview with titles, code blocks, Apply buttons via `acquireVsCodeApi()`                                   | UI panel ready                                |
+| **9** | 16–18 | Activate Extension                              | `src/extension.ts`: wire MonitorModule, ContextAggregator, AIOrchestrator, SuggestionPanel; register `uicare.manualRescue` | Extension functional                          |
+| **10**| 18–20 | Compile & Test                                  | `npm run compile`; `F5` to launch Extension Host; trigger loop & manual rescue                                          | MVP complete                                  |
+
+**Hand-Off Criteria**:  
+- Repository tagged `v0.1-extension`.  
+- `README.md` lists install, compile, run, usage instructions.  
+- Panel appears on loop and `uicare.manualRescue`.
+
+---
+
+## 5. Demo Automation Scripts
+
+### 5.1 MoodRING Playwright Script
+
+File: `demo/moodring-demo.spec.ts`
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('MoodRING end-to-end demo', async ({ page }) => {
+  await page.goto('https://<YOUR_STATIC_WEB_APP>.azurestaticapps.net');
+  await expect(page).toHaveTitle(/MoodRING/);
+  const btn = page.locator('button[title="Open MoodRING"]');
+  await btn.waitFor({ state: 'visible', timeout: 5000 });
+  await btn.click();
+  const panel = page.locator('div[role="dialog"]');
+  await expect(panel).toBeVisible();
+  await page.locator('button', { hasText: 'Focus' }).click();
+  await expect(page).toHaveClass('html', /Focus/);
+  const advice = page.locator('div#advice');
+  await advice.waitFor({ timeout: 10000 });
+  console.log('AI Suggestion:', await advice.textContent());
+  await page.locator('button[aria-label="Close"]').click();
+  await expect(panel).toBeHidden();
+});
