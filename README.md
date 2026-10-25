@@ -2,9 +2,10 @@
 
 **A fail-safe Progressive Web App for high-risk neurodivergent users with vision-based "reading the room" capabilities.**
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![License](https://img.shields.io/badge/license-MIT-blue)]()
-[![Tests](https://img.shields.io/badge/tests-72%20passing-success)]()
+[![CI](https://github.com/coreyalejandro/uicare-hui/actions/workflows/ci.yml/badge.svg)](https://github.com/coreyalejandro/uicare-hui/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+> **Status:** research prototype (May–June 2026). Not all automated checks pass yet: the safety-core unit tests fail on the latest version (live status in the CI badge above). Not a medical device. This work continues in [UICare](https://github.com/coreyalejandro/uicare-system).
 
 ---
 
